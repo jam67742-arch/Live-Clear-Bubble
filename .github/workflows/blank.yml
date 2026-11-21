@@ -30,6 +30,10 @@ jobs:
           gradle-version: '8.9'
       - name: Extract project
         run: unzip -o LiveClearBubble_AndroidStudio_Project.zip -d project
+      - name: Fix Gradle properties
+        working-directory: project/LiveClearBubble
+        run: |
+          printf '%s\\n' 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8' 'android.useAndroidX=true' 'kotlin.code.style=official' > gradle.properties
       - name: Build APK
         working-directory: project/LiveClearBubble
         run: gradle --no-daemon assembleDebug
