@@ -36,6 +36,12 @@ jobs:
           printf '%s\n' 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8' 'android.useAndroidX=true' 'kotlin.code.style=official' > gradle.properties
           echo '--- gradle.properties ---'
           cat gradle.properties
+      - name: Align Java and Kotlin JVM targets
+        working-directory: project/LiveClearBubble
+        run: |
+          sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g; s/jvmTarget = "1.8"/jvmTarget = "17"/g; s/jvmTarget = '\''1.8'\''/jvmTarget = '\''17'\''/g' app/build.gradle
+          echo '--- app/build.gradle JVM settings ---'
+          grep -n -E 'sourceCompatibility|targetCompatibility|jvmTarget' app/build.gradle || true
       - name: Build APK
         working-directory: project/LiveClearBubble
         run: gradle --no-daemon assembleDebug
