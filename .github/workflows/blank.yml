@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'LiveClearBubble_AndroidStudio_Project.zip'
+      - '.github/workflows/blank.yml'
 
 permissions:
   contents: read
