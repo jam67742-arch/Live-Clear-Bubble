@@ -44,7 +44,19 @@ jobs:
           grep -n -E 'sourceCompatibility|targetCompatibility|jvmTarget' app/build.gradle || true
       - name: Build APK
         working-directory: project/LiveClearBubble
-        run: gradle --no-daemon assembleDebug
+        run: |
+          cat > /tmp/force-jvm-target.gradle <<'EOF'
+          allprojects {
+              tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
+                  sourceCompatibility = '17'
+                  targetCompatibility = '17'
+              }
+              tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                  kotlinOptions.jvmTarget = '17'
+              }
+          }
+          EOF
+          gradle --no-daemon --init-script /tmp/force-jvm-target.gradle assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
