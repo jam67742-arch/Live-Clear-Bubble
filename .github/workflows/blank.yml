@@ -30,6 +30,8 @@ jobs:
           gradle-version: '8.9'
       - name: Extract project
         run: unzip -o LiveClearBubble_AndroidStudio_Project.zip -d project
+      - name: Inspect source
+        run: cat project/LiveClearBubble/app/src/main/java/com/example/liveclearbubble/MainActivity.kt
       - name: Fix Gradle properties
         working-directory: project/LiveClearBubble
         run: |
