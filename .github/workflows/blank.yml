@@ -40,27 +40,24 @@ jobs:
         working-directory: project/LiveClearBubble
         run: |
           sed -i 's/JavaVersion.VERSION_1_8/JavaVersion.VERSION_17/g; s/jvmTarget = "1.8"/jvmTarget = "17"/g; s/jvmTarget = '\''1.8'\''/jvmTarget = '\''17'\''/g' app/build.gradle
-          echo '--- app/build.gradle JVM settings ---'
-          grep -n -E 'sourceCompatibility|targetCompatibility|jvmTarget' app/build.gradle || true
-      - name: Build APK
-        working-directory: project/LiveClearBubble
-        run: |
-          cat > /tmp/force-jvm-target.gradle <<'EOF'
-          allprojects {
-              afterEvaluate {
-                  tasks.withType(org.gradle.api.tasks.compile.JavaCompile).configureEach {
-                      sourceCompatibility = '17'
-                      targetCompatibility = '17'
-                  }
-                  tasks.configureEach { task ->
-                      if (task.class.name.contains('KotlinCompile')) {
-                          task.kotlinOptions.jvmTarget = '17'
-                      }
-                  }
+          cat >> app/build.gradle <<'EOF'
+
+          // Force matching bytecode targets for Android Java and Kotlin tasks.
+          android {
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+              kotlinOptions {
+                  jvmTarget = '17'
               }
           }
           EOF
-          gradle --no-daemon --init-script /tmp/force-jvm-target.gradle assembleDebug
+          echo '--- app/build.gradle JVM settings ---'
+          tail -n 18 app/build.gradle
+      - name: Build APK
+        working-directory: project/LiveClearBubble
+        run: gradle --no-daemon assembleDebug
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
